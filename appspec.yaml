@@ -1,0 +1,20 @@
+version: 0.0
+os: linux
+files:
+  - source: /
+    destination: /opt/warfile
+    file_exists_behavior: overwrite
+
+hooks:
+  BeforeInstall:
+    - location: ./before_install.sh
+      timeout: 300
+      runas: ec2-user
+  AfterInstall:
+    - location: ./after_install.sh
+      timeout: 300
+      runas: ec2-user
+  ApplicationStart:
+    - location: validate.sh
+      timeout: 300
+      runas: ec2-user
