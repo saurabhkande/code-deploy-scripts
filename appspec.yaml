@@ -9,12 +9,12 @@ hooks:
   BeforeInstall:
     - location: ./before_install.sh
       timeout: 300
-      runas: ec2-user
+      runas: root
   AfterInstall:
     - location: ./after_install.sh
       timeout: 300
-      runas: ec2-user
+      runas: root
   ApplicationStart:
-    - location: validate.sh
+    - location: ./validate.sh
       timeout: 300
-      runas: ec2-user
+      runas: root
