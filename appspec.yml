@@ -2,7 +2,7 @@ version: 0.0
 os: linux
 files:
   - source: /
-    destination: /opt/warfile
+    destination: /home/ec2-user/dest-dir/
     file_exists_behavior: overwrite
 
 hooks:

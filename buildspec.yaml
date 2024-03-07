@@ -1,0 +1,52 @@
+version: 0.2
+phases:
+  install:
+    runtime-versions:
+       java: corretto17
+    commands:
+        - apt update -y
+        - apt install -y maven
+        - apt install awscli -y
+  pre_build:
+    commands:
+       - java -version
+       - mvn -version
+       - aws --version
+  build:
+    commands:
+      - echo "Entered the build phase..."
+      - mvn clean package
+  post_build:
+    commands:
+      - echo Build completed successfully
+      - echo "Retrieving pem key from parameter store"
+      - aws ssm get-parameter --name cross-acc-ec2-pem --with-decryption --query Parameter.Value --output text > login.pem
+      - chmod 400 login.pem
+      - ls -l
+      #- cd webapp/target
+      - ls -l
+      #- echo "Copying War file to destination account"
+      #- aws s3 cp webapp/target/webapp.war s3://aisecops/war/webapp.war
+      #- scp -o StrictHostKeyChecking=no -i login.pem webapp/target/webapp.war ubuntu@10.0.111.26:/home/ubuntu/webapp.war
+      - echo "Copying the war file to S3 bucket of source account"
+      - aws s3 cp webapp/target/webapp.war s3://war-bucket-ap/warfile/webapp.war
+      # - aws sts assume-role --role-arn arn:aws:iam::847415613895:role/dem-code-build --role-session-name "AssumeRoleForSSMAssociation" > assume-role-output.json
+      # - export AWS_ACCESS_KEY_ID=$(jq -r '.Credentials.AccessKeyId' assume-role-output.json)
+      # - export AWS_SECRET_ACCESS_KEY=$(jq -r '.Credentials.SecretAccessKey' assume-role-output.json)
+      # - export AWS_SESSION_TOKEN=$(jq -r '.Credentials.SessionToken' assume-role-output.json)
+      # - aws sts get-caller-identity
+      # - echo "Triggering SSM association"
+      # - aws ssm start-associations-once --association-ids 8deb2f3d-dc54-44dd-a022-ff0873023751 --region us-east-1 
+
+artifacts:
+  files:
+    - "**/*.war"
+    - scripts/*
+    - appspec.yml
+  secondary-artifacts:
+    deploy_artifact:
+      files:
+        - "**/*.war"
+        - scripts/*
+        - appspec.yml
+  discard-paths: yes

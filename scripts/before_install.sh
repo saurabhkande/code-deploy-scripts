@@ -8,4 +8,3 @@ fi
 
 mkdir -p $FOLDER
 
-echo "The BeforeInstall deployment lifecycle event successfully completed." > before-install.txt
